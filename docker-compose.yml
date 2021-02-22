@@ -1,0 +1,31 @@
+version: "2"
+
+services:
+  grafana:
+    image: grafana/grafana
+    environment:
+      GF_EXPLORE_ENABLED: 'true'
+    ports:
+    - "3000:3000"
+    links:
+    - loki
+
+  loki:
+    image: grafana/loki
+    ports:
+    - "3100:3100"
+
+  rsysloki:
+    build: .
+    hostname: rsysloki
+    restart: unless-stopped
+    environment:
+      TZ: 'Asia/Tokyo'
+    volumes:
+    - ./etc/rsyslog.conf:/etc/rsyslog.conf
+    - ./etc/rsyslog.d/:/etc/rsyslog.d/
+    ports:
+    - "514:514"
+    - "514:514/udp"
+    links:
+      - loki
